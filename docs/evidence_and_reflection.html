@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cloud Courier Evidence and Reflection</title>
+  <style>
+    @page { size: letter; margin: 0.65in; }
+    body { font: 10.5pt/1.42 Arial, sans-serif; color: #17252a; margin: 0; }
+    h1 { color: #006c75; font-size: 22pt; margin: 0 0 14pt; }
+    h2 { color: #006c75; font-size: 15pt; margin: 18pt 0 7pt; }
+    h3 { color: #24464b; font-size: 11.5pt; margin: 12pt 0 3pt; }
+    p { margin: 0 0 8pt; }
+    ul { margin: 0 0 8pt; padding-left: 20pt; }
+    table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    th { background: #006c75; color: white; text-align: left; }
+    th, td { border: 1px solid #9ab6ba; padding: 5pt; vertical-align: top; }
+    tr:nth-child(even) td { background: #eef6f7; }
+    code { font-family: Consolas, monospace; font-size: 0.92em; }
+    .context { background: #eef6f7; border-left: 4pt solid #006c75; padding: 9pt 12pt; }
+    .checklist { page-break-inside: avoid; }
+  </style>
+</head>
+<body>
+  <h1>Cloud Courier Evidence and Reflection</h1>
+
+  <h2>Test context</h2>
+  <div class="context">
+    <ul>
+      <li><strong>Device:</strong> Samsung SM S731U1</li>
+      <li><strong>Platform:</strong> Android 17 (API 37)</li>
+      <li><strong>Notification permission:</strong> authorized</li>
+      <li><strong>FCM token:</strong> current installation token was available and copied without being displayed or recorded</li>
+      <li><strong>Valid message:</strong> “Campus event update” / “View the latest campus information”</li>
+      <li><strong>Valid custom data:</strong> <code>action=update_ui</code>, <code>asset=promo</code></li>
+      <li><strong>T4 change:</strong> <code>asset=unknown</code>; all other fields remained the same</li>
+    </ul>
+  </div>
+
+  <h2>Results</h2>
+  <table>
+    <thead><tr><th>Test</th><th>Expected handler/result</th><th>Observed result</th><th>Status</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td>T1 Foreground</td><td><code>onMessage</code>; promo title/image</td><td><code>onMessage</code>, accepted diagnostic, Student Center image, receipt 1</td><td>Pass</td><td><code>T1_foreground.png</code></td></tr>
+      <tr><td>T2 Background tap</td><td><code>onMessageOpenedApp</code>; promo title/image</td><td><code>onMessageOpenedApp</code>, accepted diagnostic, Student Center image, receipt 2</td><td>Pass</td><td><code>T2_background_tap.png</code></td></tr>
+      <tr><td>T3 Cold-start tap</td><td><code>getInitialMessage</code>; promo title/image</td><td><code>getInitialMessage</code>, accepted diagnostic, Student Center image, receipt 1 on the new launch</td><td>Pass</td><td><code>T3_cold_start_tap.png</code></td></tr>
+      <tr><td>T4 Invalid foreground</td><td><code>onMessage</code>; reject unknown asset and preserve content</td><td><code>onMessage</code>, rejection diagnostic, Student Center title/image preserved, receipt 4, no crash</td><td>Pass</td><td><code>T4_invalid_payload.png</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Graduate reflection</h2>
+  <h3>Setup and payload</h3>
+  <p>I registered a new Android Firebase app with the exact package name <code>com.mustafadev.cloud_courier</code> instead of reusing an Activity 13 registration. FlutterFire generated matching options, and initialization is awaited before listeners or widgets start. The <code>action</code> key must equal <code>update_ui</code>; the <code>asset</code> key is then mapped only to <code>default</code> or <code>promo</code>. This allowlist prevents a cloud value from becoming an arbitrary local asset path.</p>
+
+  <h3>Lifecycle and evidence</h3>
+  <p>T1 reached <code>onMessage</code>, T2 reached <code>onMessageOpenedApp</code>, and the notification-triggered T3 launch reached <code>getInitialMessage</code>, as the labeled screenshots show. <code>onBackgroundMessage</code> is separately registered for non-UI background work because its isolate cannot directly mutate widget state. These results establish behavior for one Samsung device, Android 17, and notification-plus-data payload; they do not guarantee delivery across devices, force-stop conditions, connectivity states, or data-only payload policies. Permission authorizes notification display but does not prove delivery.</p>
+
+  <h3>Validation and next step</h3>
+  <p>T4 changed <code>asset</code> to <code>unknown</code>. The validator reported the error while preserving the prior title and Student Center image. Listener cancellation and mounted/disposed guards prevent callbacks from updating dead UI. An alternative would construct asset paths dynamically, but that is shorter and unsafe. A feasible next improvement is a retryable initialization status; success would be observable when a simulated token failure displays an error and a retry later enables secure token copying without duplicate listeners.</p>
+
+  <div class="checklist">
+    <h2>Submission checklist</h2>
+    <ul>
+      <li><strong>Repository:</strong> https://github.com/mustafadev123/in_class_14</li>
+      <li><strong>Evidence:</strong> four PNG files in <code>evidence/</code></li>
+      <li><strong>Reflection:</strong> this document</li>
+      <li><strong>Limitation:</strong> results apply only to the tested device/platform/payload conditions described above</li>
+    </ul>
+  </div>
+</body>
+</html>
