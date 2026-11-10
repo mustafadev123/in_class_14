@@ -1,6 +1,31 @@
-# cloud_courier
+# Cloud Courier
 
-A new Flutter project.
+A Flutter/Firebase Cloud Messaging activity that maps validated cloud data to
+visible campus content across foreground, background-tap, and cold-start paths.
+
+## Payload
+
+```json
+{
+  "notification": {
+    "title": "Campus event update",
+    "body": "View the latest campus information"
+  },
+  "data": {
+    "action": "update_ui",
+    "asset": "promo"
+  }
+}
+```
+
+Supported asset values are `default` and `promo`. Unknown or missing values are
+rejected with an on-screen diagnostic while the last valid content remains.
+
+## Verification
+
+Run `flutter analyze`, `flutter test`, and `flutter run` on an Android device
+with Google Play services. Live test results and the graduate reflection are in
+[`docs/evidence_and_reflection.md`](docs/evidence_and_reflection.md).
 
 ## Getting Started
 

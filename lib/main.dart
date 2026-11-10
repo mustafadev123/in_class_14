@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'firebase_options.dart';
 import 'services/fcm_service.dart';
@@ -131,6 +132,24 @@ class _CloudCourierHomeState extends State<CloudCourierHome> {
                   ],
                 ),
               ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: _fcmService.token == null
+                  ? null
+                  : () async {
+                      await Clipboard.setData(
+                        ClipboardData(text: _fcmService.token!),
+                      );
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Current token copied securely.'),
+                        ),
+                      );
+                    },
+              icon: const Icon(Icons.copy),
+              label: const Text('Copy current token'),
             ),
             const SizedBox(height: 12),
             const Text(

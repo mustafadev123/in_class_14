@@ -23,6 +23,7 @@ class FCMService extends ChangeNotifier {
   String? _messageId;
   AuthorizationStatus? _authorizationStatus;
   bool _tokenAvailable = false;
+  String? _token;
   int _receiptCount = 0;
   bool _initialized = false;
   bool _disposed = false;
@@ -34,6 +35,7 @@ class FCMService extends ChangeNotifier {
   String? get messageId => _messageId;
   AuthorizationStatus? get authorizationStatus => _authorizationStatus;
   bool get tokenAvailable => _tokenAvailable;
+  String? get token => _token;
   int get receiptCount => _receiptCount;
 
   Future<void> initialize() async {
@@ -48,6 +50,7 @@ class FCMService extends ChangeNotifier {
     );
     _tokenSubscription = _messagingInstance.onTokenRefresh.listen((token) {
       if (_disposed) return;
+      _token = token;
       _tokenAvailable = token.isNotEmpty;
       notifyListeners();
     });
@@ -63,6 +66,7 @@ class FCMService extends ChangeNotifier {
     try {
       final token = await _messagingInstance.getToken();
       if (_disposed) return;
+      _token = token;
       _tokenAvailable = token != null;
     } on FirebaseException catch (error) {
       _diagnostic = 'Token check failed: ${error.code}.';
