@@ -1,30 +1,43 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:cloud_courier/main.dart';
+import 'package:cloud_courier/models/payload_result.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:cloud_courier/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('valid promo payload selects the bundled event image', () {
+    final result = validatePayload(const {
+      'action': 'update_ui',
+      'asset': 'promo',
+    });
 
-    // Verify that our counter starts at 0.
+    expect(result, isA<ValidPayload>());
+    expect((result as ValidPayload).asset, CampusAsset.promo);
+  });
+
+  test('unsupported asset is rejected with a diagnostic', () {
+    final result = validatePayload(const {
+      'action': 'update_ui',
+      'asset': 'unknown',
+    });
+
+    expect(result, isA<InvalidPayload>());
+    expect((result as InvalidPayload).reason, contains('unsupported asset'));
+  });
+
+  test('missing asset is rejected with a diagnostic', () {
+    final result = validatePayload(const {'action': 'update_ui'});
+
+    expect(result, isA<InvalidPayload>());
+    expect((result as InvalidPayload).reason, contains('missing'));
+  });
+
+  testWidgets('initial screen shows safe default content', (tester) async {
+    await tester.pumpWidget(const CloudCourierApp(startMessaging: false));
+
+    expect(find.text('Cloud Courier'), findsOneWidget);
+    expect(find.text('Campus updates'), findsOneWidget);
+    await tester.scrollUntilVisible(find.byKey(const Key('diagnostic')), 300);
+    expect(find.text('Waiting for a cloud message.'), findsOneWidget);
     expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
   });
 }
