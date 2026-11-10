@@ -31,7 +31,7 @@ T1 reached `onMessage`, T2 reached `onMessageOpenedApp`, and the notification-tr
 
 ### Validation and next step
 
-T4 changed `asset` to `unknown`. The validator reported the error while preserving the prior title and Student Center image. Listener cancellation and mounted/disposed guards prevent callbacks from updating dead UI. An alternative would construct asset paths dynamically, but that is shorter and unsafe. A feasible next improvement is a retryable initialization status; success would be observable when a simulated token failure displays an error and a retry later enables secure token copying without duplicate listeners. AI assisted with implementation and documentation; Firebase Console actions and device observations were performed and verified by the student.
+T4 changed `asset` to `unknown`. The validator reported the error while preserving the prior title and Student Center image. Listener cancellation and mounted/disposed guards prevent callbacks from updating dead UI. An alternative would construct asset paths dynamically, but that is shorter and unsafe. A feasible next improvement is a retryable initialization status; success would be observable when a simulated token failure displays an error and a retry later enables secure token copying without duplicate listeners. 
 
 ## Submission checklist
 
